@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SamvaadPay | Shopping Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">
+      <span class="brand-mark">S</span>
+      <span>Samvaad<span class="brand-pay">Pay</span></span>
+    </a>
+    <span class="secure-note">● Secure shopping experience</span>
+  </header>
+  <main class="container">
+
+    <section class="intro">
+      <p class="eyebrow">YOUR PERSONAL SHOPPING ASSISTANT</p>
+      <h1>Good finds.<br><span>Easy conversations.</span></h1>
+      <p>Discover something lovely and let SamvaadPay help you shop.</p>
+    </section>
+
+    <section class="workspace">
+
+      <div class="chat-panel">
+
+        <div class="chat-heading">
+          <div class="avatar">S</div>
+          <div>
+            <h3>Samvaad Assistant</h3>
+            <p>● Online · Shopping help</p>
+          </div>
+          <span class="demo-tag">DEMO</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+
+          <div class="message assistant">
+            <div class="bubble">
+              Hi there! 👋 Welcome to our boutique.
+              What are you looking for today?
+            </div>
+          </div>
+
+          <div class="message user">
+            <div class="bubble">
+              I'm looking for a cute everyday tote bag.
+            </div>
+          </div>
+
+          <div class="message assistant">
+            <div class="bubble">
+              I have just the thing! Here's a sample pick
+              from our demo collection.
+            </div>
+          </div>
+
+          <article class="product-card">
+            <div class="product-image">
+              <svg viewBox="0 0 240 180" width="220"
+                   role="img" aria-label="Canvas tote bag illustration">
+                <ellipse cx="120" cy="158" rx="66" ry="9" fill="#d9d5ce"/>
+                <path d="M76 63 C76 18 164 18 164 63"
+                      fill="none" stroke="#8a674d"
+                      stroke-width="10" stroke-linecap="round"/>
+                <path d="M59 56 Q120 65 181 56 L170 151
+                         Q120 164 70 151 Z"
+                      fill="#cba47c" stroke="#8a674d" stroke-width="2"/>
+                <text x="120" y="112" text-anchor="middle"
+                      font-size="15" font-family="Arial"
+                      font-weight="bold" fill="#72543d">
+                  little joys
+                </text>
+              </svg>
+            </div>
+
+            <div class="product-info">
+              <span class="sample-tag">SAMPLE ITEM</span>
+              <h3>Everyday Canvas Tote</h3>
+              <p>A roomy tote for your daily essentials.</p>
+
+              <div class="product-bottom">
+                <div>
+                  <small>Demo price</small>
+                  <h2>₹799</h2>
+                </div>
+                <button id="checkoutBtn" type="button">
+                  Continue ↗
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <p class="disclaimer">
+            Demo product · Price and availability are illustrative.
+          </p>
+
+        </div>
+
+        <form id="chatForm" class="composer">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Ask about a product..."
+            maxlength="500"
+            autocomplete="off"
+            aria-label="Type your message"
+          >
+          <button type="submit">Send ↑</button>
+        </form>
+
+        <p class="hint">
+          Demo chat · Don't enter personal or payment information
+        </p>
+      </div>
+
+      <aside class="side-panel">
+
+        <div class="side-card welcome-card">
+          <p class="eyebrow">SHOP AT YOUR PACE</p>
+          <h2>A little help<br>goes a long way.</h2>
+          <p>
+            Ask questions, explore products, and find
+            your next favorite.
+          </p>
+        </div>
+
+        <div class="side-card">
+          <h3>Try asking</h3>
+          <div class="suggestions">
+            <button type="button" class="suggestion"
+              data-message="Do you have another color?">
+              Another color? ↗
+            </button>
+
+            <button type="button" class="suggestion"
+              data-message="What is the price?">
+              What is the price? ↗
+            </button>
+
+            <button type="button" class="suggestion"
+              data-message="How does checkout work?">
+              How does checkout work? ↗
+            </button>
+          </div>
+        </div>
+
+        <div class="trust-note">
+          <strong>✓ Checkout with care</strong>
+          <p>
+            This prototype doesn't process payments.
+            Real checkout will be connected through the backend.
+          </p>
+        </div>
+
+      </aside>
+    </section>
+
+    <section class="how-section">
+      <p class="eyebrow">SIMPLE BY DESIGN</p>
+      <h2>From browsing to finding your favorite.</h2>
+
+      <div class="steps">
+        <div class="step">
+          <span>01</span>
+          <h3>Tell us</h3>
+          <p>Describe what you're looking for.</p>
+        </div>
+
+        <div class="step">
+          <span>02</span>
+          <h3>Discover</h3>
+          <p>Explore product suggestions.</p>
+        </div>
+
+        <div class="step">
+          <span>03</span>
+          <h3>Checkout</h3>
+          <p>Continue using a trusted payment flow when connected.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <strong>SamvaadPay</strong>
+      <span>Hackathon prototype · Demo experience</span>
+    </footer>
+
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
