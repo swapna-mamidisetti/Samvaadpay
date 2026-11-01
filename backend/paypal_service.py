@@ -7,6 +7,7 @@ load_dotenv()
 BASE = "https://api-m.sandbox.paypal.com"
 CID = os.getenv("PAYPAL_CLIENT_ID")
 SECRET = os.getenv("PAYPAL_SECRET")
+APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000")
 
 
 def get_token():
@@ -34,8 +35,8 @@ def create_order(amount, currency="USD"):
             "payment_source": {
                 "paypal": {
                     "experience_context": {
-                        "return_url": "http://localhost:8000/success",
-                        "cancel_url": "http://localhost:8000/cancel",
+                        "return_url": f"{APP_BASE_URL}/success",
+                        "cancel_url": f"{APP_BASE_URL}/cancel",
                         "user_action": "PAY_NOW",
                     }
                 }
