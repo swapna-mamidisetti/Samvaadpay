@@ -1,4 +1,3 @@
-
 :root {
   --navy: #14233b;
   --blue: #476ce5;
@@ -473,3 +472,9 @@ footer {
     flex-direction: column;
   }
 }
+
+.product-bottom button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
