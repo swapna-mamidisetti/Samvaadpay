@@ -3,6 +3,7 @@ const chatForm = document.getElementById("chatForm");
 const messageInput = document.getElementById("messageInput");
 const chatMessages = document.getElementById("chatMessages");
 const checkoutBtn = document.getElementById("checkoutBtn");
+const buyNowBtn = document.getElementById("buyNowBtn");
 const toast = document.getElementById("toast");
 
 let toastTimer;
@@ -93,11 +94,47 @@ document.querySelectorAll(".suggestion").forEach((button) => {
   });
 });
 
-// Demo checkout action
-checkoutBtn.addEventListener("click", () => {
-  showToast(
-    "Demo only: checkout is not connected. No payment was started."
-  );
+
+const BACKEND_URL = "http://localhost:8000";
+
+buyNowBtn.addEventListener("click", async () => {
+  try {
+    buyNowBtn.disabled = true;
+    showToast("Connecting to checkout...");
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/checkout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          product_id: 1
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Checkout failed");
+    }
+
+    if (!data.approval_url) {
+      throw new Error("PayPal link not received");
+    }
+
+    // Redirect to PayPal
+    window.location.href = data.approve_link;
+
+  } catch (error) {
+    console.error("Checkout error:", error);
+    showToast(error.message || "Unable to start payment");
+
+    checkoutBtn.disabled = false;
+    checkoutBtn.textContent = "Pay Now ↗";
+  }
 });
 
 /*
