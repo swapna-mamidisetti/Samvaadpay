@@ -94,7 +94,8 @@ def chat_with_ai(chat_input: ChatMessage):
         }
 
     return {
-        "status": "success",
+       "status": "success",
+        "reply": f"I found {len(products)} matching product(s) for you.",
         "extracted_data": data,
         "products": products,
     }
