@@ -7,11 +7,13 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from google import genai
 from backend.paypal_routes import router as paypal_router
+from backend.db import init_db, search_products
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 app = FastAPI(title="SamvaadPay Backend")
+init_db()
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,14 +34,16 @@ def home():
 @app.post("/chat")
 def chat_with_ai(chat_input: ChatMessage):
     prompt = f"""
-    A seller wrote this message to sell a product: "{chat_input.message}".
-    Extract the item details and return a JSON object with these exact keys:
+    A customer wrote this shopping message: "{chat_input.message}".
+    Extract what they want and return a JSON object with these exact keys:
     {{
-        "item_name": "string or null",
-        "quantity": "number or null",
-        "price": "number or null"
+        "category": "shoes" or "clothing" or null,
+        "color": "lowercase color or null",
+        "size": "size as text, e.g. 8 or M, or null",
+        "max_price": number or null
     }}
-    The message may be in Telugu, English, or mixed. Price is per one item.
+    The message may be in Telugu, English, or mixed.
+    Use null for anything not mentioned. Return only JSON.
     """
 
     data = None
@@ -48,7 +52,7 @@ def chat_with_ai(chat_input: ChatMessage):
     for attempt in range(3):
         try:
             response = client.models.generate_content(
-                model="gemini-3.8-flash",
+                model="gemini-3.6-flash",
                 contents=prompt,
                 config={"response_mime_type": "application/json"}
             )
@@ -61,13 +65,26 @@ def chat_with_ai(chat_input: ChatMessage):
     if data is None:
         raise HTTPException(status_code=503, detail=f"AI busy, try again: {last_error}")
 
-    if data["item_name"] is None or data["price"] is None:
+    size = data.get("size")
+    max_price = data.get("max_price")
+
+    products = search_products(
+        category=data.get("category"),
+        color=data.get("color"),
+        size=str(size) if size is not None else None,
+        max_price=float(max_price) if max_price is not None else None,
+    )
+
+    if not products:
         return {
-            "status": "need_more_info",
-            "message": "Please tell the product name and price"
+            "status": "no_results",
+            "message": "Sorry, no matching products found. Try a different color, size or price.",
+            "extracted_data": data,
+            "products": [],
         }
 
     return {
         "status": "success",
-        "extracted_data": data
+        "extracted_data": data,
+        "products": products,
     }
