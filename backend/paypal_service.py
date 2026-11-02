@@ -8,8 +8,31 @@ BASE = "https://api-m.sandbox.paypal.com"
 CID = os.getenv("PAYPAL_CLIENT_ID")
 SECRET = os.getenv("PAYPAL_SECRET")
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000")
+INR_PER_USD = float(os.getenv("INR_PER_USD", "95"))
+def calculate_total(quantity, price, currency="INR"):
+    """Returns (total_inr, total_usd) from quantity x price."""
+    if quantity is None:
+        quantity = 1
+    if quantity < 1:
+        raise ValueError("quantity must be at least 1")
+    if price is None or price <= 0:
+        raise ValueError("price is required and must be greater than 0")
 
+    total = round(quantity * price, 2)
 
+    if currency == "INR":
+        total_inr = total
+        total_usd = round(total / INR_PER_USD, 2)
+    elif currency == "USD":
+        total_usd = total
+        total_inr = round(total * INR_PER_USD, 2)
+    else:
+        raise ValueError("currency must be INR or USD")
+
+    if total_usd < 0.01:
+        raise ValueError("total is too small to create a payment")
+
+    return total_inr, total_usd
 def get_token():
     r = requests.post(
         f"{BASE}/v1/oauth2/token",
@@ -20,7 +43,7 @@ def get_token():
     return r.json()["access_token"]
 
 
-def create_order(amount, currency="USD"):
+def create_order(amount, currency="USD", description=None):
     r = requests.post(
         f"{BASE}/v2/checkout/orders",
         headers={
@@ -30,8 +53,11 @@ def create_order(amount, currency="USD"):
         json={
             "intent": "CAPTURE",
             "purchase_units": [
-                {"amount": {"currency_code": currency, "value": f"{amount:.2f}"}}
-            ],
+    {
+        "amount": {"currency_code": currency, "value": f"{amount:.2f}"},
+        "description": (description or "SamvaadPay order")[:127],
+    }
+],
             "payment_source": {
                 "paypal": {
                     "experience_context": {

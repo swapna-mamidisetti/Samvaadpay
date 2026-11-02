@@ -3,23 +3,37 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-from backend.paypal_service import create_order, capture_order
+from backend.paypal_service import create_order, capture_order, calculate_total
 
 router = APIRouter()
 
 
 class OrderRequest(BaseModel):
-    amount: float
-    currency: str = "USD"
-
+    item_name: str | None = None
+    quantity: int | None = None
+    price: float | None = None
+    currency: str = "INR"
 
 @router.post("/create-order")
 def create(req: OrderRequest):
     try:
-        order_id, link = create_order(req.amount, req.currency)
+        total_inr, total_usd = calculate_total(req.quantity, req.price, req.currency)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    description = f"{req.item_name or 'Item'} x {req.quantity or 1}"
+
+    try:
+        order_id, link = create_order(total_usd, "USD", description)
     except requests.HTTPError as e:
         raise HTTPException(status_code=502, detail=f"PayPal error: {e.response.text}")
-    return {"order_id": order_id, "approve_link": link}
+
+    return {
+        "order_id": order_id,
+        "approve_link": link,
+        "total_inr": total_inr,
+        "total_usd": total_usd,
+    }
 
 
 @router.post("/capture-order/{order_id}")
