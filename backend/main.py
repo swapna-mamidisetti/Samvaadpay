@@ -59,12 +59,22 @@ def chat_with_ai(chat_input: ChatMessage):
             data = json.loads(response.text)
             break
         except Exception as e:
+            print(f"Gemini error (attempt {attempt + 1}): {e}")
             last_error = e
             time.sleep(2)
 
     if data is None:
         raise HTTPException(status_code=503, detail=f"AI busy, try again: {last_error}")
+    if isinstance(data, list) and len(data) > 0:
+        data = data[0]
 
+    if not isinstance(data, dict) or all(v is None for v in data.values()):
+        return {
+            "status": "need_more_info",
+            "message": "Tell me what you want, for example: red shoes size 8 under 2000",
+            "extracted_data": data,
+            "products": [],
+        }
     size = data.get("size")
     max_price = data.get("max_price")
 
