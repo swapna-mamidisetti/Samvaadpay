@@ -24,12 +24,15 @@ app.add_middleware(
 
 app.include_router(paypal_router)
 
+
 class ChatMessage(BaseModel):
     message: str
+
 
 @app.get("/")
 def home():
     return {"status": "success", "message": "SamvaadPay AI Engine is Live!"}
+
 
 @app.post("/chat")
 def chat_with_ai(chat_input: ChatMessage):
@@ -65,36 +68,47 @@ def chat_with_ai(chat_input: ChatMessage):
 
     if data is None:
         raise HTTPException(status_code=503, detail=f"AI busy, try again: {last_error}")
+
     if isinstance(data, list) and len(data) > 0:
         data = data[0]
 
     if not isinstance(data, dict) or all(v is None for v in data.values()):
+        text = "Tell me what you want, for example: red shoes size 8 under 2000"
         return {
             "status": "need_more_info",
-            "message": "Tell me what you want, for example: red shoes size 8 under 2000",
+            "reply": text,
+            "message": text,
             "extracted_data": data,
             "products": [],
         }
+
     size = data.get("size")
     max_price = data.get("max_price")
+
+    try:
+        max_price = float(max_price) if max_price is not None else None
+    except (ValueError, TypeError):
+        max_price = None
 
     products = search_products(
         category=data.get("category"),
         color=data.get("color"),
         size=str(size) if size is not None else None,
-        max_price=float(max_price) if max_price is not None else None,
+        max_price=max_price,
     )
 
     if not products:
+        text = "Sorry, no matching products found. Try a different color, size or price."
         return {
             "status": "no_results",
-            "message": "Sorry, no matching products found. Try a different color, size or price.",
+            "reply": text,
+            "message": text,
             "extracted_data": data,
             "products": [],
         }
 
     return {
-       "status": "success",
+        "status": "success",
         "reply": f"I found {len(products)} matching product(s) for you.",
         "extracted_data": data,
         "products": products,
