@@ -56,23 +56,33 @@ def init_db():
                 ("Black Hoodie", "clothing", "black", "L", 40.0, 8),
                 ("Grey Hoodie", "clothing", "grey", "M", 38.0, 9),
                 ("Green Hoodie", "clothing", "green", "L", 42.0, 5),
+                                ("Red Cotton Kurta", "clothing", "red", "M", 30.0, 6),
+                ("Blue Cotton Kurta", "clothing", "blue", "L", 32.0, 5),
+                ("Black Kurta", "clothing", "black", "M", 34.0, 4),
             ],
         )
     conn.commit()
     conn.close()
 
-def search_products(category=None, color=None, size=None, max_price=None):
+def search_products(category=None, color=None, size=None, max_price=None, keyword=None):
     query = "SELECT * FROM products WHERE stock > 0"
     params = []
     if category: query += " AND category = ?"; params.append(category)
     if color: query += " AND color = ?"; params.append(color)
     if size: query += " AND size = ?"; params.append(size)
     if max_price: query += " AND price <= ?"; params.append(max_price)
+    if keyword:
+        k = keyword.lower().strip()
+        if k in ("kurti", "kurthi", "kurtha", "kurtas", "kurthis"):
+            k = "kurta"
+        if len(k) > 3 and k.endswith("s"):
+            k = k[:-1]
+        query += " AND LOWER(name) LIKE ?"
+        params.append(f"%{k}%")
     conn = get_conn()
     rows = [dict(r) for r in conn.execute(query, params).fetchall()]
     conn.close()
     return rows
-
 def reduce_stock(product_id):
     conn = get_conn()
     conn.execute("UPDATE products SET stock = stock - 1 WHERE id = ? AND stock > 0", (product_id,))

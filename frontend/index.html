@@ -14,12 +14,14 @@
     </a>
     <span class="secure-note">● Secure shopping experience</span>
   </header>
+
   <main class="container">
     <section class="intro">
       <p class="eyebrow">YOUR PERSONAL SHOPPING ASSISTANT</p>
       <h1>Good finds.<br><span>Easy conversations.</span></h1>
       <p>Discover something lovely and let SamvaadPay help you shop.</p>
     </section>
+
     <section class="workspace">
       <div class="chat-panel">
         <div class="chat-heading">
@@ -30,6 +32,7 @@
           </div>
           <span class="demo-tag">DEMO</span>
         </div>
+
         <div class="chat-messages" id="chatMessages">
 
           <div class="message assistant">
@@ -75,20 +78,18 @@
               <span class="sample-tag">SAMPLE ITEM</span>
               <h3>Everyday Canvas Tote</h3>
               <p>A roomy tote for your daily essentials.</p>
-        
 
-<div class="product-bottom">
-  <div>
-    <small>Demo price</small>
-    <h2>$45.00</h2>
-  </div>
+              <div class="product-bottom">
+                <div>
+                  <small>Demo price</small>
+                  <h2>$45.00</h2>
+                </div>
 
-  <button id="checkoutBtn" type="button">
-    Pay Now ↗
-  </button>
-</div>
-
-
+                <!-- data-product-id = DB products.id. Only the id is sent to the backend. -->
+                <button id="checkoutBtn" type="button" data-product-id="1">
+                  Pay Now ↗
+                </button>
+              </div>
             </div>
           </article>
 
@@ -149,8 +150,8 @@
         <div class="trust-note">
           <strong>✓ Checkout with care</strong>
           <p>
-            This prototype doesn't process payments.
-            Real checkout will be connected through the backend.
+            Payments are handled securely by PayPal.
+            The price is always confirmed by our server, never by this page.
           </p>
         </div>
 
@@ -177,7 +178,7 @@
         <div class="step">
           <span>03</span>
           <h3>Checkout</h3>
-          <p>Continue using a trusted payment flow when connected.</p>
+          <p>Continue using a trusted payment flow.</p>
         </div>
       </div>
     </section>
@@ -186,7 +187,6 @@
       <strong>SamvaadPay</strong>
       <span>Hackathon prototype · Demo experience</span>
     </footer>
-
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
