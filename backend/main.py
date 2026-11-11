@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from google import genai
 from backend.paypal_routes import router as paypal_router
 from backend.db import init_db, search_products
-from backend.shop_routes import router as shop_router
+#from backend.shop_routes import router as shop_router
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(paypal_router)
-app.include_router(shop_router)
+#app.include_router(shop_router)
 
 
 class ChatMessage(BaseModel):
