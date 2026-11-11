@@ -56,6 +56,9 @@ def init_db():
                 ("Black Hoodie", "clothing", "black", "L", 40.0, 8),
                 ("Grey Hoodie", "clothing", "grey", "M", 38.0, 9),
                 ("Green Hoodie", "clothing", "green", "L", 42.0, 5),
+                                ("Red Cotton Kurta", "clothing", "red", "M", 30.0, 6),
+                ("Blue Cotton Kurta", "clothing", "blue", "L", 32.0, 5),
+                ("Black Kurta", "clothing", "black", "M", 34.0, 4),
             ],
         )
     conn.commit()
