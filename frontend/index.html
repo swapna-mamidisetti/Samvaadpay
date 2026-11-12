@@ -19,7 +19,7 @@
     <section class="intro">
       <p class="eyebrow">YOUR PERSONAL SHOPPING ASSISTANT</p>
       <h1>Good finds.<br><span>Easy conversations.</span></h1>
-      <p>Discover something lovely and let SamvaadPay help you shop.</p>
+      <p>Tell us what you want, in English or Telugu, and SamvaadPay finds it and helps you pay.</p>
     </section>
 
     <section class="workspace">
@@ -34,76 +34,19 @@
         </div>
 
         <div class="chat-messages" id="chatMessages">
-
           <div class="message assistant">
             <div class="bubble">
-              Hi there! 👋 Welcome to our boutique.
-              What are you looking for today?
+              Hi there! 👋 Welcome to our store.
+              What are you looking for today? Try “black shoes under $50” or “red hoodie”.
             </div>
           </div>
-
-          <div class="message user">
-            <div class="bubble">
-              I'm looking for a cute everyday tote bag.
-            </div>
-          </div>
-
-          <div class="message assistant">
-            <div class="bubble">
-              I have just the thing! Here's a sample pick
-              from our demo collection.
-            </div>
-          </div>
-
-          <article class="product-card">
-            <div class="product-image">
-              <svg viewBox="0 0 240 180" width="220"
-                   role="img" aria-label="Canvas tote bag illustration">
-                <ellipse cx="120" cy="158" rx="66" ry="9" fill="#d9d5ce"/>
-                <path d="M76 63 C76 18 164 18 164 63"
-                      fill="none" stroke="#8a674d"
-                      stroke-width="10" stroke-linecap="round"/>
-                <path d="M59 56 Q120 65 181 56 L170 151
-                         Q120 164 70 151 Z"
-                      fill="#cba47c" stroke="#8a674d" stroke-width="2"/>
-                <text x="120" y="112" text-anchor="middle"
-                      font-size="15" font-family="Arial"
-                      font-weight="bold" fill="#72543d">
-                  little joys
-                </text>
-              </svg>
-            </div>
-
-            <div class="product-info">
-              <span class="sample-tag">SAMPLE ITEM</span>
-              <h3>Everyday Canvas Tote</h3>
-              <p>A roomy tote for your daily essentials.</p>
-
-              <div class="product-bottom">
-                <div>
-                  <small>Demo price</small>
-                  <h2>$45.00</h2>
-                </div>
-
-                <!-- data-product-id = DB products.id. Only the id is sent to the backend. -->
-                <button id="checkoutBtn" type="button" data-product-id="1">
-                  Pay Now ↗
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <p class="disclaimer">
-            Demo product · Price and availability are illustrative.
-          </p>
-
         </div>
 
         <form id="chatForm" class="composer">
           <input
             type="text"
             id="messageInput"
-            placeholder="Ask about a product..."
+            placeholder="Ask for a product, e.g. red hoodie..."
             maxlength="500"
             autocomplete="off"
             aria-label="Type your message"
@@ -131,18 +74,18 @@
           <h3>Try asking</h3>
           <div class="suggestions">
             <button type="button" class="suggestion"
-              data-message="Do you have another color?">
-              Another color? ↗
+              data-message="Black shoes under $50">
+              Black shoes under $50 ↗
             </button>
 
             <button type="button" class="suggestion"
-              data-message="What is the price?">
-              What is the price? ↗
+              data-message="Red hoodie">
+              Red hoodie ↗
             </button>
 
             <button type="button" class="suggestion"
-              data-message="How does checkout work?">
-              How does checkout work? ↗
+              data-message="Yellow kurta">
+              Yellow kurta ↗
             </button>
           </div>
         </div>
@@ -172,13 +115,13 @@
         <div class="step">
           <span>02</span>
           <h3>Discover</h3>
-          <p>Explore product suggestions.</p>
+          <p>We check our stock and suggest the best matches.</p>
         </div>
 
         <div class="step">
           <span>03</span>
           <h3>Checkout</h3>
-          <p>Continue using a trusted payment flow.</p>
+          <p>Pay securely with PayPal.</p>
         </div>
       </div>
     </section>
