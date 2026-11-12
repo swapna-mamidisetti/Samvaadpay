@@ -9,6 +9,31 @@ const sendBtn = chatForm.querySelector("button[type='submit']");
 
 let toastTimer;
 
+// ---------- chat history (survives the PayPal redirect and refresh) ----------
+
+const HISTORY_KEY = "samvaadpay_chat_history";
+
+function loadHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    return Array.isArray(saved) ? saved : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+let chatHistory = loadHistory();
+
+function saveHistory() {
+  try {
+    // keep only the latest 60 items so storage never grows too big
+    chatHistory = chatHistory.slice(-60);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory));
+  } catch (e) {
+    // storage blocked: the chat still works, it just won't be remembered
+  }
+}
+
 // Used only for the little color circle on product cards
 const COLOR_MAP = {
   black: "#2b2b2b", white: "#f4f4f4", brown: "#8a5a3c", red: "#d64545",
@@ -29,7 +54,7 @@ function scrollToBottom() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function addMessage(text, sender = "user") {
+function addMessage(text, sender = "user", save = true) {
   const row = document.createElement("div");
   row.className = `message ${sender}`;
 
@@ -40,11 +65,16 @@ function addMessage(text, sender = "user") {
   row.appendChild(bubble);
   chatMessages.appendChild(row);
   scrollToBottom();
+
+  if (save) {
+    chatHistory.push({ type: "message", sender, text });
+    saveHistory();
+  }
   return row;
 }
 
 function addTyping() {
-  const row = addMessage("...", "assistant");
+  const row = addMessage("...", "assistant", false); // typing dots are never saved
   row.querySelector(".bubble").classList.add("typing");
   return row;
 }
@@ -98,7 +128,7 @@ function buildProductCard(product) {
   buyBtn.type = "button";
   buyBtn.textContent = "Buy Now ↗";
   // Only the product id goes to the backend. Price comes from the DB there.
-  buyBtn.addEventListener("click", () => buyProduct(product.id, buyBtn));
+  buyBtn.addEventListener("click", () => buyProduct(product, buyBtn));
 
   bottom.appendChild(priceBox);
   bottom.appendChild(buyBtn);
@@ -109,7 +139,7 @@ function buildProductCard(product) {
   return card;
 }
 
-function renderProducts(products) {
+function renderProducts(products, save = true) {
   if (!products || products.length === 0) return;
 
   const list = document.createElement("div");
@@ -118,6 +148,11 @@ function renderProducts(products) {
 
   chatMessages.appendChild(list);
   scrollToBottom();
+
+  if (save) {
+    chatHistory.push({ type: "products", products });
+    saveHistory();
+  }
 }
 
 // ---------- chat ----------
@@ -194,7 +229,29 @@ document.querySelectorAll(".suggestion").forEach((button) => {
 
 // ---------- checkout ----------
 
-async function buyProduct(productId, button) {
+const LAST_ITEM_KEY = "samvaadpay_last_item";
+
+function rememberChosenItem(product) {
+  try {
+    localStorage.setItem(
+      LAST_ITEM_KEY,
+      JSON.stringify({ name: product.name, price: Number(product.price) })
+    );
+  } catch (e) {}
+}
+
+function takeChosenItem() {
+  try {
+    const item = JSON.parse(localStorage.getItem(LAST_ITEM_KEY));
+    localStorage.removeItem(LAST_ITEM_KEY);
+    return item;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function buyProduct(product, button) {
+  const productId = product.id;
   const originalText = button.textContent;
 
   try {
@@ -217,6 +274,14 @@ async function buyProduct(productId, button) {
       throw new Error("PayPal link not received");
     }
 
+    // Save the chosen item in the chat history BEFORE leaving for PayPal
+    addMessage(
+      `I want to buy: ${product.name} ($${Number(product.price).toFixed(2)})`,
+      "user"
+    );
+    addMessage("Taking you to PayPal to complete the payment...", "assistant");
+    rememberChosenItem(product);
+
     window.location.href = data.approve_link;
   } catch (error) {
     console.error("Checkout error:", error);
@@ -226,15 +291,52 @@ async function buyProduct(productId, button) {
   }
 }
 
+// ---------- restore the earlier chat on page load ----------
+// (the greeting stays at the top, then the saved messages and product cards)
+chatHistory.slice().forEach((item) => {
+  if (item.type === "message") {
+    addMessage(item.text, item.sender, false);
+  } else if (item.type === "products") {
+    renderProducts(item.products, false);
+  }
+});
+
 // ---------- coming back from PayPal ----------
 // Works when the backend redirects to  <frontend>/?payment=success  or  ?payment=cancel
-const payment = new URLSearchParams(window.location.search).get("payment");
+// The backend sends the paid item's name and price in the URL, so the message
+// shows the right product even if this is a different site than the one you chatted on.
+const urlParams = new URLSearchParams(window.location.search);
+const payment = urlParams.get("payment");
+const urlItemName = urlParams.get("item");
+const urlItemPrice = parseFloat(urlParams.get("price"));
+const savedItem = payment ? takeChosenItem() : null;
+
+const chosenItem = urlItemName
+  ? { name: urlItemName, price: Number.isFinite(urlItemPrice) ? urlItemPrice : null }
+  : savedItem;
+
+function itemLabel(item) {
+  return item.price !== null && item.price !== undefined
+    ? `${item.name} ($${Number(item.price).toFixed(2)})`
+    : item.name;
+}
+
 if (payment === "success") {
-  addMessage("Payment successful! 🎉 Thank you for shopping with SamvaadPay.", "assistant");
+  addMessage(
+    chosenItem
+      ? `Payment successful for ${itemLabel(chosenItem)}! 🎉 Thank you for shopping with SamvaadPay.`
+      : "Payment successful! 🎉 Thank you for shopping with SamvaadPay.",
+    "assistant"
+  );
   showToast("Payment successful ✅");
   window.history.replaceState({}, "", window.location.pathname);
 } else if (payment === "cancel") {
-  addMessage("Payment was cancelled. You can pick an item and try again anytime.", "assistant");
+  addMessage(
+    chosenItem
+      ? `Payment for ${itemLabel(chosenItem)} was cancelled. You can pick it again anytime.`
+      : "Payment was cancelled. You can pick an item and try again anytime.",
+    "assistant"
+  );
   showToast("Payment cancelled");
   window.history.replaceState({}, "", window.location.pathname);
 }
